@@ -1,0 +1,116 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account within the VaultLock application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
+    "VaultItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VaultItem",
+      "type": "object",
+      "description": "Represents a saved password entry in the user's vault.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the VaultItem entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N VaultItem)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the vault item."
+        },
+        "username": {
+          "type": "string",
+          "description": "Username associated with the vault item."
+        },
+        "password": {
+          "type": "string",
+          "description": "Encrypted password for the vault item."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL associated with the vault item.",
+          "format": "uri"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes for the vault item."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "username",
+        "password"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user data. User ID is used for path-based ownership.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/vault_items/{vaultItemId}",
+        "definition": {
+          "entityName": "VaultItem",
+          "schema": {
+            "$ref": "#/backend/entities/VaultItem"
+          },
+          "description": "Stores vault items belonging to a user.  Vault items are client-side encrypted. Path-based ownership ensures only the user can access their vault items.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user."
+            },
+            {
+              "name": "vaultItemId",
+              "description": "The unique ID of the vault item."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore data structure prioritizes security and scalability for the VaultLock application, focusing on authorization independence and simple, robust security rules. It uses path-based ownership for user data to simplify rules and ensure data privacy.\n\n*   **Users:** User data is stored in the `/users/{userId}` collection. This structure allows for easy retrieval of user-specific data and simplifies security rules based on user ID.\n*   **Vault Items:** Vault items are stored in the `/users/{userId}/vault_items/{vaultItemId}` subcollection. This establishes a clear ownership relationship between users and their vault items, enabling simple and secure access control. Each vault item is directly associated with a specific user, ensuring that only the user can access their own vault items. This approach uses path-based ownership.\n\nThis design ensures authorization independence by avoiding the need for `get()` calls in security rules. Access control is determined solely by the user ID in the path. It also effectively supports the required QAPs by segregating user data and vault items, making listing operations secure and efficient. The structure inherently avoids rules that act as filters, as each collection and subcollection serves a distinct purpose with clear ownership."
+  }
+}
