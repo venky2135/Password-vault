@@ -37,7 +37,7 @@ import {
   Loader,
 } from "lucide-react";
 import { Logo } from "@/components/icons";
-import { useAuth, useUser } from "@/firebase";
+import { useAuth, useUser } from '@/lib/localFirebase';
 
 const navItems = [
   { href: "/", icon: Vault, label: "Vault" },

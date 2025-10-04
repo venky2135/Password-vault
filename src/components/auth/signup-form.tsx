@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Logo } from "@/components/icons";
 import { KeyRound, Mail } from "lucide-react";
-import { useAuth, initiateEmailSignUp } from "@/firebase";
+import { useAuth, initiateEmailSignUp } from '@/lib/localFirebase';
 
 
 const formSchema = z.object({

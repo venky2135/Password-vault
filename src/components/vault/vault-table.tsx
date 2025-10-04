@@ -31,15 +31,15 @@ export function VaultTable({
   onEditItem,
   onDeleteItem,
 }: VaultTableProps) {
-    const { toast } = useToast();
+  const { toast } = useToast();
 
-    const handleCopyPassword = (password: string) => {
-        navigator.clipboard.writeText(password);
-        toast({
-            title: "Password Copied",
-            description: "The password has been copied to your clipboard.",
-        });
-    }
+  const handleCopyPassword = (password: string) => {
+    navigator.clipboard.writeText(password);
+    toast({
+      title: "Password Copied",
+      description: "The password has been copied to your clipboard.",
+    });
+  };
 
   return (
     <div className="rounded-lg border">
@@ -60,16 +60,18 @@ export function VaultTable({
             items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback>{item.title.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        {item.title}
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{item.title.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    {item.title}
+                  </div>
                 </TableCell>
                 <TableCell>{item.username}</TableCell>
                 <TableCell className="hidden md:table-cell">
-                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{item.url}</a>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    {item.url}
+                  </a>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">{item.lastModified}</TableCell>
                 <TableCell>
@@ -87,7 +89,10 @@ export function VaultTable({
                       <DropdownMenuItem onSelect={() => handleCopyPassword(item.password)}>
                         <Copy className="mr-2 h-4 w-4" /> Copy Password
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => onDeleteItem(item)} className="text-destructive focus:text-destructive">
+                      <DropdownMenuItem
+                        onSelect={() => onDeleteItem(item)}
+                        className="text-destructive focus:text-destructive"
+                      >
                         <Trash2 className="mr-2 h-4 w-4" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

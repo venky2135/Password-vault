@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Logo } from "@/components/icons";
 import { KeyRound, Mail } from "lucide-react";
-import { useAuth, initiateEmailSignIn } from "@/firebase";
+import { useAuth } from '@/lib/localFirebase';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -36,7 +36,7 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
-  const auth = useAuth();
+  const { signIn } = useAuth(); // ✅ use signIn instead of initiateEmailSignIn
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,9 +47,14 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    initiateEmailSignIn(auth, values.email, values.password);
-    router.push("/");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await signIn(values.email, values.password); // use signIn
+      router.push("/"); // redirect after successful login
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Optionally: show a toast or form error
+    }
   }
 
   return (
@@ -70,7 +75,7 @@ export function LoginForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                   <div className="relative">
+                  <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input placeholder="name@example.com" {...field} className="pl-10" />
