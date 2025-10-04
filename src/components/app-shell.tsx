@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Avatar,
   AvatarFallback,
@@ -20,7 +20,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
-  SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -35,18 +34,29 @@ import {
   User,
   Vault,
   Wand2,
+  Loader,
 } from "lucide-react";
 import { Logo } from "@/components/icons";
+import { useAuth, useUser } from "@/firebase";
 
 const navItems = [
   { href: "/", icon: Vault, label: "Vault" },
   { href: "/generator", icon: Wand2, label: "Generator" },
-  { href: "/settings", icon: Settings, label: "Settings" },
 ];
+
+const publicRoutes = ["/login", "/signup"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === "/login" || pathname === "/signup";
+  const isAuthPage = publicRoutes.includes(pathname);
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user && !isAuthPage) {
+      router.push("/login");
+    }
+  }, [isUserLoading, user, isAuthPage, router]);
 
   if (isAuthPage) {
     return (
@@ -54,6 +64,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     );
+  }
+
+  if (isUserLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Or a loading spinner, this will be briefly visible before redirect
   }
 
   return (
@@ -106,7 +128,15 @@ function AppHeader() {
   const { toggleSidebar, isMobile } = useSidebar();
   const pathname = usePathname();
   const pageTitle =
-    navItems.find((item) => item.href === pathname)?.label || "Dashboard";
+    navItems.find((item) => item.href === pathname)?.label || "Vault";
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push("/login");
+  };
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6 lg:px-8">
@@ -124,7 +154,7 @@ function AppHeader() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
-              <AvatarImage src="https://picsum.photos/seed/1/100/100" alt="User Avatar" />
+              {user?.photoURL && <AvatarImage src={user.photoURL} alt="User Avatar" />}
               <AvatarFallback>
                 <User />
               </AvatarFallback>
@@ -134,23 +164,23 @@ function AppHeader() {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">John Doe</p>
+              <p className="text-sm font-medium leading-none">{user?.displayName || "User"}</p>
               <p className="text-xs leading-none text-muted-foreground">
-                john.doe@example.com
+                {user?.email}
               </p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem disabled>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem disabled>
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>

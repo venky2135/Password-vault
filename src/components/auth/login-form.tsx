@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Logo } from "@/components/icons";
 import { KeyRound, Mail } from "lucide-react";
+import { useAuth, initiateEmailSignIn } from "@/firebase";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -34,6 +36,9 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
+  const auth = useAuth();
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,8 +48,8 @@ export function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle login logic here
+    initiateEmailSignIn(auth, values.email, values.password);
+    router.push("/");
   }
 
   return (
