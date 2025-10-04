@@ -1,5 +1,24 @@
-# Firebase Studio
+## Getting Started
 
-This is a NextJS starter in Firebase Studio.
+### 1️⃣ Clone the repository
 
-To get started, take a look at src/app/page.tsx.
+
+git clone [your-repo-url]
+cd [repo-folder]
+2️⃣ Install dependencies
+bash
+
+npm install
+
+3️⃣ Run the development server
+
+npm run dev
+
+
+Note: The Turbopack icon in dev mode is normal. You can disable it in next.config.js with:
+
+experimental: { turbo: { devOverlay: false } }
+4️⃣ Build and run production
+
+npm run build
+npm run start
