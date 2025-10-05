@@ -9,51 +9,7 @@ export interface VaultItem {
   }
   
   const mockData: VaultItem[] = [
-    {
-      id: "1",
-      title: "Google",
-      username: "john.doe@gmail.com",
-      password: "veryStrongPassword123!",
-      url: "https://google.com",
-      notes: "Main google account for services.",
-      lastModified: "2 days ago",
-    },
-    {
-      id: "2",
-      title: "GitHub",
-      username: "johndoe",
-      password: "anotherSecurePassword#$%",
-      url: "https://github.com",
-      notes: "Personal GitHub account.",
-      lastModified: "5 days ago",
-    },
-    {
-        id: "3",
-        title: "Twitter / X",
-        username: "@johndoe",
-        password: "socialMediaPassword1!",
-        url: "https://x.com",
-        notes: "",
-        lastModified: "1 week ago",
-    },
-    {
-        id: "4",
-        title: "Figma",
-        username: "john.doe@design.co",
-        password: "designToolPass!@#",
-        url: "https://figma.com",
-        notes: "Work account for design projects.",
-        lastModified: "2 weeks ago",
-    },
-    {
-        id: "5",
-        title: "AWS Console",
-        username: "aws-admin-jd",
-        password: "cloudInfrastructurePass*()",
-        url: "https://aws.amazon.com",
-        notes: "Root access. Use with caution.",
-        lastModified: "1 month ago",
-    },
+    
   ];
   
   // In a real application, these functions would interact with a database.

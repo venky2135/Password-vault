@@ -2,6 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+// ----------------------------------------------------
+// User and Auth Types
+// ----------------------------------------------------
 interface User {
   uid: string;
   email: string;
@@ -15,13 +18,15 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-// Create a mock auth context
+// ----------------------------------------------------
+// Mock Auth Context
+// ----------------------------------------------------
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const FirebaseClientProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // Simulate persisted auth (mock)
+  // Simulate persisted auth
   useEffect(() => {
     const stored = localStorage.getItem("mockUser");
     if (stored) setUser(JSON.parse(stored));
@@ -51,20 +56,21 @@ export const FirebaseClientProvider = ({ children }: { children: React.ReactNode
   );
 };
 
-// Hook for authentication context
+// ----------------------------------------------------
+// Hooks
+// ----------------------------------------------------
 export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within FirebaseClientProvider");
   return ctx;
 };
 
-// ✅ Return both user and a mock loading flag
+// ✅ Helper hook for user and loading state
 export const useUser = (): { user: User | null; isUserLoading: boolean } => {
   const { user } = useAuth();
   const [isUserLoading, setIsUserLoading] = useState(true);
 
   useEffect(() => {
-    // simulate async auth initialization
     const timer = setTimeout(() => setIsUserLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
@@ -72,4 +78,18 @@ export const useUser = (): { user: User | null; isUserLoading: boolean } => {
   return { user, isUserLoading };
 };
 
-
+// ----------------------------------------------------
+// ✅ Fix: Add initiateEmailSignUp mock
+// ----------------------------------------------------
+export async function initiateEmailSignUp(
+  auth: AuthContextType,
+  email: string,
+  password: string
+): Promise<void> {
+  try {
+    await auth.signUp(email, password);
+    console.log("✅ Mock email sign-up successful for:", email);
+  } catch (err) {
+    console.error("❌ Error during mock sign-up:", err);
+  }
+}
